@@ -1,0 +1,18 @@
+<resources>
+
+    <string name="app_name">Common</string>
+    <string name="current_value">Current:</string>
+    <string name="saved_value">Saved:</string>
+    <string name="none">none</string>
+    <string name="apply">Apply</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="path">Path</string>
+    <string name="directory">Directory</string>
+    <string name="file">Files</string>
+    <string name="internal_sdcard">Internal sdcard</string>
+    <string name="external_sdcard">External sdcard</string>
+
+
+
+</resources>
