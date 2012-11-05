@@ -349,7 +349,39 @@ public class SystemCommand {
         process.write("md5sum * > backup.md5\n");
         process.term();
     }
-    
+
+    public static void partition_backup_for_gnt(String path) {
+        Log.d(TAG, "execute partition_backup_for_gs3 path=" + path);
+
+        RootProcess process = new RootProcess();
+        if (!process.init()) {
+            return;
+        }
+
+        process.write("mkdir -p " + path + "\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p1 of=" + path + "/smd_hdr.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p2 of=" + path + "/sbl1.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p3 of=" + path + "/sbl2.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p5 of=" + path + "/rpm.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p6 of=" + path + "/sbl3.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p7 of=" + path + "/aboot.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p9 of=" + path + "/tz.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p10 of=" + path + "/ssd.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p11 of=" + path + "/pit.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p12 of=" + path + "/param.lfs bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p14 of=" + path + "/efs.img bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p15 of=" + path + "/msm_st2.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p16 of=" + path + "/msm_fsg.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p18 of=" + path + "/efsclear1.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p19 of=" + path + "/efsclear2.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p20 of=" + path + "/m9k_fsg.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p21 of=" + path + "/enc.img.ext4 bs=4096\n");
+
+        process.write("cd " + path + "\n");
+        process.write("md5sum * > backup.md5\n");
+        process.term();
+    }
+
     public static void time_adjust_recovery() {
         Log.d(TAG, "execute time_adjust_recovery");
 
