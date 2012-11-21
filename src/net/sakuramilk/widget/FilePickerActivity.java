@@ -95,8 +95,13 @@ public abstract class FilePickerActivity extends PreferenceActivity
 
         // get sdcard path
         String internalSdcardPath = Misc.getSdcardPath(true);
+        if (internalSdcardPath.indexOf("/mnt") < 0) {
+        	internalSdcardPath = "/mnt" + internalSdcardPath;
+        }
         String externalSdcardPath = Misc.getSdcardPath(false);
-
+        if (externalSdcardPath.indexOf("/mnt") < 0) {
+        	externalSdcardPath = "/mnt" + externalSdcardPath;
+        }
         PreferenceScreen pref;
         pref = prefManager.createPreferenceScreen(this);
         pref.setTitle(R.string.internal_sdcard);
