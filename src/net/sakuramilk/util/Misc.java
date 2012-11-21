@@ -36,9 +36,13 @@ public class Misc {
     static int sIsFeatureAospEnabled = -1;
     static final SysFs sSysFsBuildTarget = new SysFs("proc/sys/kernel/build_target");
     static int sBuildTarget = -1;
+    public static boolean IsInternalSdcardRerverse = false;
 
     @SuppressLint("SdCardPath")
     public static String getSdcardPath(boolean isInternal) {
+    	if (IsInternalSdcardRerverse) {
+    		isInternal = !isInternal;
+    	}
         if (isInternal) {
             // internal sdcard path is fixed /sdcard
             return "/sdcard";
