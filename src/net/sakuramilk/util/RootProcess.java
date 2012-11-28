@@ -27,13 +27,14 @@ public class RootProcess {
     private Process mProcess = null;
     private DataOutputStream mOutputStream = null;
     private DataInputStream mInputStream = null;
+    private static String mSuPath = "su";
 
     public boolean init() {
         try {
-            mProcess = Runtime.getRuntime().exec("su");
+            mProcess = Runtime.getRuntime().exec(mSuPath);
             mOutputStream = new DataOutputStream(mProcess.getOutputStream());
             mInputStream = new DataInputStream(mProcess.getInputStream());
-            if (write("su -v\n")) {
+            if (write(mSuPath + " -v\n")) {
                 String[] results = read();
                 for (String line : results) {
                     if (line.length() > 0) {
@@ -42,8 +43,13 @@ public class RootProcess {
                 }
             }
         } catch (IOException e) {
+        	e.printStackTrace();
         }
         return false;
+    }
+    
+    public static void setSuPath(String suPath) {
+    	mSuPath = suPath;
     }
 
     public void term() {
@@ -65,6 +71,7 @@ public class RootProcess {
                 }
                 mOutputStream.close();
             } catch (IOException e) {
+            	e.printStackTrace();
             }
         }
         if(mProcess != null){
@@ -88,6 +95,7 @@ public class RootProcess {
                     }
                 } while (mInputStream.available() > 0);
             } catch (IOException e) {
+            	e.printStackTrace();
             }
             return ret.split("\n");
         }
@@ -101,6 +109,7 @@ public class RootProcess {
                 mOutputStream.flush();
                 return true;
             } catch (IOException e) {
+            	e.printStackTrace();
             }
         }
         return false;

@@ -107,6 +107,17 @@ public class SystemCommand {
         process.term();
     }
     
+    public static void rm(String path) {
+        Log.d(TAG, "execute rm path=" + path);
+
+        RootProcess process = new RootProcess();
+        if (!process.init()) {
+            return;
+        }
+        process.write("rm " + path + "\n");
+        process.term();
+    }
+    
     public static void mkdir(String path) {
         Log.d(TAG, "execute mkdir path=" + path);
 
@@ -119,13 +130,24 @@ public class SystemCommand {
     }
 
     public static void touch(String path, String permission) {
-        Log.d(TAG, "execute mkdir path=" + path);
+        Log.d(TAG, "execute touch path=" + path);
 
         RootProcess process = new RootProcess();
         if (!process.init()) {
             return;
         }
         process.write("touch " + path + "\n");
+        process.write("chmod " + permission + " " + path + "\n");
+        process.term();
+    }
+    
+    public static void chmod(String path, String permission) {
+        Log.d(TAG, "execute chmod path=" + path + " permission=" + permission);
+
+        RootProcess process = new RootProcess();
+        if (!process.init()) {
+            return;
+        }
         process.write("chmod " + permission + " " + path + "\n");
         process.term();
     }

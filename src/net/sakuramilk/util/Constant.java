@@ -20,4 +20,5 @@ public class Constant {
 	public static final String CWM_DIR = "/clockworkmod";
     public static final String CWM_BACKUP_DIR = CWM_DIR + "/backup";
     public static final String MNT_ROOT = "/mnt";
+    public static final String SU_BACKUP_PATH = "/system/usr/tweak_backup/backup-su";
 }

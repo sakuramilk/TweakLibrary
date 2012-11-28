@@ -17,6 +17,7 @@
 package net.sakuramilk.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -32,6 +33,7 @@ import android.util.Log;
 
 public class Misc {
 
+	static final String TAG = Misc.class.getSimpleName();
     static final SysFs sSysFsFeatureAosp = new SysFs("proc/sys/kernel/feature_aosp");
     static int sIsFeatureAospEnabled = -1;
     static final SysFs sSysFsBuildTarget = new SysFs("proc/sys/kernel/build_target");
@@ -40,9 +42,9 @@ public class Misc {
 
     @SuppressLint("SdCardPath")
     public static String getSdcardPath(boolean isInternal) {
-    	if (IsInternalSdcardRerverse) {
-    		isInternal = !isInternal;
-    	}
+        if (IsInternalSdcardRerverse) {
+            isInternal = !isInternal;
+        }
         if (isInternal) {
             // internal sdcard path is fixed /sdcard
             return "/sdcard";
@@ -176,9 +178,9 @@ public class Misc {
                 SystemCommand.reboot(null);
             }
 
-			@Override
-			public void onCancel() {
-			}
+            @Override
+            public void onCancel() {
+            }
         });
         dlg.show(android.R.string.dialog_alert_title, message);
     }
@@ -255,6 +257,16 @@ public class Misc {
         }
         return false;
     }
+    
+    public static boolean isTempUnroot() {
+        if (isSuperUserEnabled() == false) {
+            File file = new File(Constant.SU_BACKUP_PATH);
+            if (file.exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static String getMountedPath(String device) {
         String ret = SystemCommand.df(device);
@@ -263,5 +275,55 @@ public class Misc {
             return null;
         }
         return value[value.length - 1];
+    }
+    
+    public static void doTempUnroot() {
+    	try {
+    		SystemCommand.remount_system_rw();
+    		String suPath = "";
+    		File file = new File("/system/xbin/su");
+    		if (file.exists()) {
+				if (!file.getAbsolutePath().equals(file.getCanonicalPath())) {
+					Log.i(TAG, "/system/xbin/su is symlink");
+					SystemCommand.rm("/system/xbin/su");
+				} else {
+					suPath = "/system/xbin/su";
+				}
+    		}
+    		
+    		file = new File("/system/bin/su");
+    		if (file.exists()) {
+				if (!file.getAbsolutePath().equals(file.getCanonicalPath())) {
+					Log.i(TAG, "/system/bin/su is symlink");
+					SystemCommand.rm("/system/bin/su");
+				} else {
+					suPath = "/system/bin/su";
+				}
+    		}
+    		
+    		if (!Misc.isNullOfEmpty(suPath)) {
+				// temp un-root
+    			file = new File(Constant.SU_BACKUP_PATH);
+    			SystemCommand.mkdir(file.getParent());
+    			SystemCommand.chmod(file.getParent(), "001");
+    			SystemCommand.copy(suPath, Constant.SU_BACKUP_PATH);
+    			SystemCommand.chmod(file.getPath(), "06755");
+    			RootProcess.setSuPath(Constant.SU_BACKUP_PATH);
+    			SystemCommand.rm(suPath);
+    			SystemCommand.remount_system_ro();
+    			RootProcess.setSuPath("su");
+    		}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public static void revertTempUnroot() {
+    	RootProcess.setSuPath(Constant.SU_BACKUP_PATH);
+    	SystemCommand.remount_system_rw();
+    	SystemCommand.copy(Constant.SU_BACKUP_PATH, "/system/xbin/su");
+    	SystemCommand.chmod("/system/xbin/su", "06755");
+    	SystemCommand.remount_system_ro();
+    	RootProcess.setSuPath("su");
     }
 }
