@@ -41,13 +41,17 @@ public class Misc {
     public static boolean IsInternalSdcardRerverse = false;
 
     @SuppressLint("SdCardPath")
-    public static String getSdcardPath(boolean isInternal) {
+    public static String getSdcardPath(boolean isInternal, boolean isCwmDir) {
         if (IsInternalSdcardRerverse) {
             isInternal = !isInternal;
         }
         if (isInternal) {
             // internal sdcard path is fixed /sdcard
-            return "/sdcard";
+        	if (isCwmDir) {
+        		return "/data/media";
+        	} else {
+        		return "/sdcard";
+        	}
         } else {
             // external sdcard path search
             String[] externalSdCardPath = {
@@ -235,8 +239,8 @@ public class Misc {
         return value; // if not found value, return safe value.
     }
 
-    public static long getAvailableSdcardSize(boolean isInternal) {
-        return getAvailableSize(getSdcardPath(isInternal));
+    public static long getAvailableSdcardSize(boolean isInternal, boolean isCwmDir) {
+        return getAvailableSize(getSdcardPath(isInternal, isCwmDir));
     }
     
     public static long getAvailableSize(String mountPath) {

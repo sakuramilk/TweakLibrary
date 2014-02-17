@@ -404,6 +404,45 @@ public class SystemCommand {
         process.term();
     }
 
+    public static void partition_backup_for_gs4(String path) {
+        Log.d(TAG, "execute partition_backup_for_gs4 path=" + path);
+
+        RootProcess process = new RootProcess();
+        if (!process.init()) {
+            return;
+        }
+
+        process.write("mkdir -p " + path + "\n");
+
+        process.write("busybox dd if=/dev/block/mmcblk0p1 of=" + path + "/apnhlos.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p2 of=" + path + "/mdm.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p3 of=" + path + "/sbl1.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p4 of=" + path + "/sbl2.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p5 of=" + path + "/sbl3.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p6 of=" + path + "/aboot.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p7 of=" + path + "/rpm.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p8 of=" + path + "/tz.mbn bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p9 of=" + path + "/pad.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p10 of=" + path + "/efs.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p11 of=" + path + "/modemst1.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p12 of=" + path + "/modemst2.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p13 of=" + path + "/m9kefs1.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p14 of=" + path + "/m9kefs2.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p15 of=" + path + "/m9kefs3.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p17 of=" + path + "/persist.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p19 of=" + path + "/param.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p22 of=" + path + "/fota.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p23 of=" + path + "/backup.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p24 of=" + path + "/fsg.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p25 of=" + path + "/ssd.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p26 of=" + path + "/persdata.bin bs=4096\n");
+        process.write("busybox dd if=/dev/block/mmcblk0p28 of=" + path + "/carrier.bin bs=4096\n");
+
+        process.write("cd " + path + "\n");
+        process.write("md5sum * > backup.md5\n");
+        process.term();
+    }
+
     public static void time_adjust_recovery() {
         Log.d(TAG, "execute time_adjust_recovery");
 
@@ -412,7 +451,7 @@ public class SystemCommand {
             return;
         }
 
-        String backup_path = Misc.getSdcardPath(true) + Constant.CWM_DIR;
+        String backup_path = Misc.getSdcardPath(true, true) + Constant.CWM_DIR;
         process.write("mkdir -p " + backup_path + "\n");
         process.write("date +%s > " + backup_path + "/.date.now\n");
         process.term();
@@ -423,5 +462,19 @@ public class SystemCommand {
     public static String df(String device) {
         String ret[] = RuntimeExec.execute("df " + device + " | grep " + device + "\n", true);
         return ret[0];
+    }
+
+    public static String get_felica_key() {
+        String ret[] = RuntimeExec.execute("cat /proc/cmdline\n", true);
+        String[] cmdline = ret[0].split(" ");
+        for (String item : cmdline) {
+        	if (item.startsWith("cordon")) {
+        		String[] cordon = item.split("=");
+        		if (cordon.length == 2) {
+        			return cordon[1];
+        		}
+        	}
+        }
+        return null;
     }
 }

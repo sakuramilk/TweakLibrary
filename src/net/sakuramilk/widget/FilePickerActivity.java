@@ -94,11 +94,11 @@ public abstract class FilePickerActivity extends PreferenceActivity
         mCurPath = Constant.MNT_ROOT;
 
         // get sdcard path
-        String internalSdcardPath = Misc.getSdcardPath(true);
+        String internalSdcardPath = Misc.getSdcardPath(true, true);
         if (internalSdcardPath.indexOf("/mnt") < 0) {
         	internalSdcardPath = "/mnt" + internalSdcardPath;
         }
-        String externalSdcardPath = Misc.getSdcardPath(false);
+        String externalSdcardPath = Misc.getSdcardPath(false, true);
         if (externalSdcardPath.indexOf("/mnt") < 0) {
         	externalSdcardPath = "/mnt" + externalSdcardPath;
         }
